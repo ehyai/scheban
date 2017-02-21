@@ -21,6 +21,34 @@ SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SECRET_FILE = 'config/client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
+def events2text(calendar_id='primary', max_results=10):
+    events = get_upcoming_events(calendar_id, max_results)
+    text = ''
+    for event in events:
+        start = event['start'].get('dateTime', event['start'].get('date'))
+        end = event['end'].get('dateTime', event['end'].get('date'))
+        summary = event['summary']
+        sy, smo, sd, sh, smi, ss = extract_datetime(start)
+        ey, emo, ed, eh, emi, es = extract_datetime(end)
+        text += '{}/{} {}:{}〜{}:{} {}\n'.format(smo, sd, sh, smi, eh, emi, summary)
+
+def get_upcoming_events(calendar_id='primary', max_results=10):
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('calendar', 'v3', http=http)
+
+    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
+    print('Getting the upcoming {} events'.format(max_results))
+    events_result = service.events().list(
+        calendarId=calendar_id, timeMin=now, maxResults=max_results, singleEvents=True,
+        orderBy='startTime').execute()
+    events = events_result.get('items', [])
+
+    if not events:
+        print('No upcoming events found.')
+        return []
+    else:
+        return events
 
 def get_credentials():
     """Gets valid user credentials from storage.
@@ -47,25 +75,6 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
-def get_upcoming_events(calendar_id='primary', max_results=10):
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
-
-    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    print('Getting the upcoming {} events'.format(max_results))
-    events_result = service.events().list(
-        calendarId=calendar_id, timeMin=now, maxResults=max_results, singleEvents=True,
-        orderBy='startTime').execute()
-    events = events_result.get('items', [])
-
-    if not events:
-        print('No upcoming events found.')
-        return []
-    else:
-        return events
-
-
 def extract_datetime(datetime_text):
     ymd, time = datetime_text.split('T')
     year, month, date = ymd.split('-')
@@ -73,37 +82,13 @@ def extract_datetime(datetime_text):
     hour, minute, second = hms.split(':')
     return year, month, date, hour, minute, second
 
-
-def events2text(calendar_id='primary', max_results=10):
-    events = get_upcoming_events(calendar_id, max_results)
-    text = ''
-    for event in events:
-        start = event['start'].get('dateTime', event['start'].get('date'))
-        end = event['end'].get('dateTime', event['end'].get('date'))
-        summary = event['summary']
-        sy, smo, sd, sh, smi, ss = extract_datetime(start)
-        ey, emo, ed, eh, emi, es = extract_datetime(end)
-        text += '{}/{} {}:{}〜{}:{} {}\n'.format(smo, sd, sh, smi, eh, emi, summary)
-        #月／日 開始時間:開始分～終了時間:終了分 授業名
-
-    return text
-
-#ここから自分の
-def Myevents2text(calendar_id='primary', ):
-    #その日のうちで一番速い授業の名前と開始時刻と開始分を調べる
-
-    sy, smo, sd, sh, smi, ss = extract_datetime(start)
-    #開始時刻、開始分、授業名を返す
-    return sh, smi, summary
-
-
 if __name__ == '__main__':
     import pprint
 
     #calendar_id = '7nojpgg81q5l83g8ph7u3v60qs@group.calendar.google.com' #Aさん
     #calendar_id = 'qjai2sr4f4cdkcg5teq5pfe494@group.calendar.google.com'  #Bさん
     #calendar_id = '78bdbb2eqlt3ur3ui32tn932e4@group.calendar.google.com' #Cさん
-    calendar_id = 'dud65mi8acau7db6v129rs5un0@group.calendar.google.com'  # 授業
+    calendar_id = 'dud65mi8acau7db6v129rs5un0@group.calendar.google.com'  # Cさん
 
     pprint.pprint(get_upcoming_events(calendar_id=calendar_id))
     #pprint.pprint(get_upcoming_events(calendar_id_A=calendar_id_A,calendar_id_B=calendar_id_B,calendar_id_C=calendar_id_C))
