@@ -104,8 +104,8 @@ def Myevents2text(calendar_id='primary', max_results=50 ,mymonth=0,myday=0):
         print('2-2.%s月%s日\n' % (smo, sd))
         smo2="{0:02d}".format(mymonth)
         print('2-3.%s月%s日%s\n' % (smo, sd,summary))
-        if (smo==smo2 and sd==myday):mymonth,
-            text += '%s月%s日は%s時%s分から%sという授業が始まるよ。' % (sd,sh,smi,summary)
+        if (smo==smo2 and sd==myday):
+            text += '%s月%s日は%s時%s分から%sという授業が始まるよ。' % (mymonth,sd,sh,smi,summary)
             return text
 
             #return smo, sd, summary
