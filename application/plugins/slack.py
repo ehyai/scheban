@@ -20,14 +20,20 @@ def respond_schedule(message):
 
     #reply_message = events2text(calendar_id=calendar_id)
     #reply_message = events2text(calendar_id_A = calendar_id_A, calendar_id_B = calendar_id_B, calendar_id_C = calendar_id_C)
-    message.reply(reply_message)
+    #message.reply(reply_message)
 
 @respond_to('(\d+)日')
 def respond_schedule(message,something):
+    # 現在の月 d.month
+    d = datetime.datetime.today()
+    print('1.%s月%s日\n' % (d.month, something))
 
     calendar_id = 'dud65mi8acau7db6v129rs5un0@group.calendar.google.com'  #授業
 
-    Myevents2text()
+    reply_message = Myevents2text(calendar_id=calendar_id,mymonth=d.month,myday=something)
+    message.reply(reply_message)
+    #if(Myevents2text(calendar_id=calendar_id,mymonth=d.month,myday=something) == True):
+        #message.reply('%s日には%dという授業があるよ' % something, )
 
-
-    message.reply('%s' % something)
+    #else:
+        #message.reply('%s日には授業はないよ' % something)

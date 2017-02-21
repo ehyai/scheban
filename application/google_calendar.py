@@ -74,8 +74,8 @@ def extract_datetime(datetime_text):
     return year, month, date, hour, minute, second
 
 
-def events2text(calendar_id='primary', max_results=10):
-    events = get_upcoming_events(calendar_id, max_results)
+def events2text(calendar_id='primary', max_results=0):
+    events = get_upcoming_events(calendar_id, max_results)  #ここでmax_result件数を取ってくる
     text = ''
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
@@ -89,12 +89,33 @@ def events2text(calendar_id='primary', max_results=10):
     return text
 
 #ここから自分の
-def Myevents2text(calendar_id='primary', ):
+def Myevents2text(calendar_id='primary', max_results=50 ,mymonth=0,myday=0):
     #その日のうちで一番速い授業の名前と開始時刻と開始分を調べる
 
-    sy, smo, sd, sh, smi, ss = extract_datetime(start)
+    events = get_upcoming_events(calendar_id, max_results)  # ここでmax_result件数を取ってくる
+    text = ''
+    for event in events:
+        start = event['start'].get('dateTime', event['start'].get('date'))
+        end = event['end'].get('dateTime', event['end'].get('date'))
+        summary = event['summary']
+        sy, smo, sd, sh, smi, ss = extract_datetime(start)
+        ey, emo, ed, eh, emi, es = extract_datetime(end)
+        print('2-1.%s月%s日\n' % (mymonth, myday))
+        print('2-2.%s月%s日\n' % (smo, sd))
+        smo2="{0:02d}".format(mymonth)
+        print('2-3.%s月%s日%s\n' % (smo, sd,summary))
+        if (smo==smo2 and sd==myday):mymonth,
+            text += '%s月%s日は%s時%s分から%sという授業が始まるよ。' % (sd,sh,smi,summary)
+            return text
+
+            #return smo, sd, summary
+    text += '%s日には授業ないよ。'% myday
+    return text
+    #return False
+
+    #sy, smo, sd, sh, smi, ss = extract_datetime(start)
     #開始時刻、開始分、授業名を返す
-    return sh, smi, summary
+    # return sh, smi, summary
 
 
 if __name__ == '__main__':
